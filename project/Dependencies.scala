@@ -1,0 +1,80 @@
+import Versions.*
+import sbt.*
+
+object Versions {
+  val catsEffect = "3.6.3"
+  val pureconfig = "0.17.9"
+  val log4cats = "2.7.1"
+  val logback = "1.5.24"
+  val logbackEncoder = "9.0"
+  val http4s = "0.23.33"
+  val flyway = "11.20.1"
+  val doobie = "1.0.0-RC11"
+  val postgres = "42.7.8"
+
+  val testContainers = "0.44.1"
+  val scalaMock = "7.5.3"
+  val munit = "1.2.1"
+  val munitCatsEffect = "2.1.0"
+  val scalaCheckEffect = "2.0.0-M2"
+}
+
+object Dependencies {
+
+  object core {
+    val main: Seq[ModuleID] = Seq(
+      "org.typelevel" %% "cats-effect" % catsEffect
+    )
+
+    val test: Seq[ModuleID] = Seq(
+      "org.scalameta" %% "munit"                      % munit            % Test,
+      "org.typelevel" %% "munit-cats-effect"          % munitCatsEffect  % Test,
+      "org.typelevel" %% "scalacheck-effect"          % scalaCheckEffect % Test,
+      "org.typelevel" %% "scalacheck-effect-munit"    % scalaCheckEffect % Test,
+      "org.scalamock" %% "scalamock"                  % scalaMock        % Test,
+      "org.scalamock" %% "scalamock-cats-effect"      % scalaMock        % Test,
+      "com.dimafeng"  %% "testcontainers-scala-munit" % testContainers   % Test
+    )
+
+    val all: Seq[ModuleID] = main ++ test
+  }
+
+  val config: Seq[ModuleID] = Seq(
+    "com.github.pureconfig" %% "pureconfig-core"        % pureconfig,
+    "com.github.pureconfig" %% "pureconfig-cats-effect" % pureconfig
+  )
+
+  val logging: Seq[ModuleID] = Seq(
+    "org.typelevel"       %% "log4cats-slf4j"           % log4cats,
+    "ch.qos.logback"       % "logback-classic"          % logback % Runtime,
+    "net.logstash.logback" % "logstash-logback-encoder" % logbackEncoder
+  )
+
+  object http {
+    val main: Seq[ModuleID] = Seq(
+      "org.http4s" %% "http4s-core"   % http4s,
+      "org.http4s" %% "http4s-dsl"    % http4s,
+      "org.http4s" %% "http4s-client" % http4s,
+      "org.http4s" %% "http4s-circe"  % http4s
+    )
+
+    val all: Seq[ModuleID] = main
+  }
+
+  object db {
+    val main: Seq[ModuleID] = Seq(
+      "org.flywaydb"   % "flyway-core"     % flyway,
+      "org.tpolecat"  %% "doobie-hikari"   % doobie,
+      "org.tpolecat"  %% "doobie-core"     % doobie,
+      "org.tpolecat"  %% "doobie-postgres" % doobie,
+      "org.postgresql" % "postgresql"      % postgres
+    )
+
+    val test: Seq[ModuleID] = Seq(
+      "org.tpolecat" %% "doobie-munit"                    % doobie         % Test,
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % testContainers % Test
+    )
+
+    val all: Seq[ModuleID] = main ++ test
+  }
+}
