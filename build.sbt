@@ -8,14 +8,32 @@ lazy val root = (project in file("."))
     resolvers ++= dependencyResolvers,
     libraryDependencies ++= dependencies,
     scalacOptions ++= scalaOptions,
-    semanticdbEnabled := true, // for scalafix
-    addCommandAlias("fmt", "scalafmtAll; scalafmtSbt"),
-    addCommandAlias("fmtCheck", "scalafmtCheckAll; r"),
-    addCommandAlias("ci", "clean; fmtCheck; test")
+    semanticdbEnabled := true // for scalafix
   )
+
+lazy val integration = (project in file("integration"))
+  .dependsOn(root % "compile->compile;test->test")
+  .settings(
+    libraryDependencies ++= Dependencies.integration,
+    scalacOptions ++= scalaOptions,
+    semanticdbEnabled := true, // for scalafix
+    Test / unmanagedResourceDirectories += (root / Compile / resourceDirectory).value
+  )
+
+lazy val performance = (project in file("performance"))
+  .enablePlugins(GatlingPlugin)
+  .settings(
+    scalaVersion := "2.13.16",
+    libraryDependencies ++= Dependencies.performance
+  )
+
+addCommandAlias("fmt", ";scalafmtAll ;scalafmtSbt ;scalafixAll")
+addCommandAlias("fmtCheck", ";scalafmtCheckAll; scalafmtSbtCheck ;scalafixAll --check ")
+addCommandAlias("ci", "clean; fmtCheck; test")
 
 lazy val scalaOptions = Seq(
   "-Yexplicit-nulls",
+  "-Ywarn-unused-import",
   "-Wconf:msg=unused:info"
 )
 

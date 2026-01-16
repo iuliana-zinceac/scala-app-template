@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS greetings (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  greetings INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (name)
+);  
