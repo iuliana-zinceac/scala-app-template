@@ -207,6 +207,31 @@ When generating or modifying domain code, check imports first. If a forbidden im
 - No `null` — `-Yexplicit-nulls` is enabled; use `Option` or `.nn` for Java interop
 - Imports: organized by Scalafix (`OrganizeImports`), java imports first, then scala, then third-party
 
+## Commit Message Convention
+
+Use **Conventional Commits** format:
+
+```
+<type>(<scope>): <short summary>
+```
+
+**Types:** `feat` | `fix` | `refactor` | `test` | `chore` | `docs`
+
+**Scopes:** `domain` | `persistence` | `http` | `kafka` | `config` | `build`
+
+```
+feat(http): add POST /users endpoint
+fix(domain): handle empty name in greeting service
+test(persistence): add integration test for HelloRepository
+chore(build): bump cats-effect to 3.5.4
+refactor(domain): extract greeting logic into value object
+```
+
+**Rules:**
+- Summary line max 72 characters, imperative mood ("add", not "added")
+- Scope reflects the architectural layer changed, not the feature name
+- Use `BREAKING CHANGE:` footer for backwards-incompatible changes
+
 ## File Placement
 
 | What | Where |

@@ -94,9 +94,10 @@ The template follows **hexagonal architecture** (ports & adapters):
    direnv allow
    ```
 
-2. Activate git hooks:
+2. Activate git hooks and commit template:
    ```bash
    git config core.hooksPath .git-hooks
+   git config commit.template .gitmessage
    ```
 
 3. Start PostgreSQL:

@@ -1,0 +1,31 @@
+# <type>(<scope>): <short summary>  (max 72 chars)
+#
+# Types:
+#   feat     – new feature
+#   fix      – bug fix
+#   refactor – code change that is neither a fix nor a feature
+#   test     – adding or updating tests
+#   chore    – build, deps, tooling, CI
+#   docs     – documentation only
+#
+# Scopes (optional):
+#   domain       – domain layer (models, services, errors)
+#   persistence  – driven/persistence adapter
+#   http         – driving/http adapter
+#   kafka        – driven/kafka or driving/kafka adapter
+#   config       – configuration (application.conf, Config.scala)
+#   build        – sbt build files, plugins, dependencies
+#
+# Examples:
+#   feat(http): add POST /users endpoint
+#   fix(domain): handle empty name in greeting service
+#   test(persistence): add integration test for HelloRepository
+#   chore(build): bump cats-effect to 3.5.4
+#   refactor(domain): extract greeting logic into value object
+#
+# Body (optional, blank line after summary):
+#
+#
+# Footer — breaking changes or issue refs (optional):
+# BREAKING CHANGE: <description>
+# Closes #<issue>
