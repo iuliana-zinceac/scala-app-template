@@ -3,18 +3,18 @@ package dev.iuly.main
 import cats.effect.{Async, Resource}
 import cats.syntax.all.*
 import com.comcast.ip4s.*
-import doobie.Transactor
-import org.typelevel.log4cats.Logger
-import org.typelevel.log4cats.slf4j.Slf4jLogger
 import dev.iuly.helloapp.domain.*
 import dev.iuly.helloapp.infra.driven.persistence.HelloRepository as HelloRepositoryImpl
 import dev.iuly.helloapp.infra.driving.http.{HelloEndpoint, HelloRoute}
+import doobie.Transactor
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.Router
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+import sttp.apispec.openapi.circe.yaml.*
 import sttp.tapir.docs.openapi.OpenAPIDocsInterpreter
 import sttp.tapir.server.http4s.Http4sServerInterpreter
 import sttp.tapir.swagger.SwaggerUI
-import sttp.apispec.openapi.circe.yaml.*
 
 trait AppModule[F[_]] {
   def wireUp(): Resource[F, Unit]
@@ -26,7 +26,7 @@ object AppModule {
     new AppModule[F]:
       override def wireUp(): Resource[F, Unit] =
         val helloRepository = HelloRepositoryImpl[F](dbTransactor)
-        val helloService    = HelloService[F](helloRepository)
+        val helloService = HelloService[F](helloRepository)
 
         // API routes from Tapir endpoint + server logic
         val apiRoutes = HelloRoute.routes[F](helloService)
@@ -46,7 +46,7 @@ object AppModule {
         for
           logger <- Resource.eval(Slf4jLogger.create[F])
           _      <- Resource.eval(logger.info("Starting server..."))
-          _ <- EmberServerBuilder
+          _      <- EmberServerBuilder
             .default[F]
             .withHost(host"0.0.0.0")
             .withPort(Port.fromInt(config.serverPort).getOrElse(port"8080"))

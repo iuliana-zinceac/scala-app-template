@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Running CI checks before push (sbt ci)..."
+echo "To skip: git push --no-verify"
+echo ""
+
+if ! sbt ci; then
+  echo ""
+  echo "Push blocked: sbt ci failed."
+  echo "Fix the issues above, then push again."
+  exit 1
+fi
+
+echo ""
+echo "CI passed. Pushing..."

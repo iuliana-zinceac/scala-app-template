@@ -94,17 +94,23 @@ The template follows **hexagonal architecture** (ports & adapters):
    direnv allow
    ```
 
-2. Start PostgreSQL:
+2. Activate git hooks and commit template:
+   ```bash
+   git config core.hooksPath .git-hooks
+   git config commit.template .gitmessage
+   ```
+
+3. Start PostgreSQL:
    ```bash
    docker compose up -d
    ```
 
-3. Run the application:
+4. Run the application:
    ```bash
    sbt run
    ```
 
-4. Try it out:
+5. Try it out:
    ```bash
    curl http://localhost:8080/hello/World
    ```
@@ -134,6 +140,21 @@ Configuration is loaded from `src/main/resources/application.conf` using PureCon
 | `DATABASE_PASSWORD` | `postgres` | Database password |
 | `DATABASE_NAME` | `helloapp` | Database name |
 | `DATABASE_THREADS_NUM` | `4` | Connection pool size |
+
+## Feature Development Workflow (AI-assisted)
+
+This template includes [spec-kit](https://github.com/github/spec-kit) for spec-driven development with Claude. Run these slash commands inside Claude Code:
+
+| Command | Purpose |
+|---------|---------|
+| `/speckit.constitution` | Define project principles — run once per project |
+| `/speckit.specify` | Create a feature spec and branch |
+| `/speckit.clarify` | Resolve spec ambiguities (optional) |
+| `/speckit.plan` | Generate technical plan and design artifacts |
+| `/speckit.tasks` | Break the plan into ordered tasks |
+| `/speckit.analyze` | Cross-artifact consistency check (optional) |
+| `/speckit.checklist` | Validate requirement quality (optional) |
+| `/speckit.implement` | Execute tasks phase by phase |
 
 ## Using as a Template
 
