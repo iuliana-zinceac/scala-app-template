@@ -4,14 +4,15 @@ set -e
 
 JSON_MODE=false
 SHORT_NAME=""
-BRANCH_NUMBER=""
+BRANCH_TYPE="feat"
+TASK_ID=""
 ARGS=()
 i=1
 while [ $i -le $# ]; do
     arg="${!i}"
     case "$arg" in
-        --json) 
-            JSON_MODE=true 
+        --json)
+            JSON_MODE=true
             ;;
         --short-name)
             if [ $((i + 1)) -gt $# ]; then
@@ -27,35 +28,52 @@ while [ $i -le $# ]; do
             fi
             SHORT_NAME="$next_arg"
             ;;
-        --number)
+        --type)
             if [ $((i + 1)) -gt $# ]; then
-                echo 'Error: --number requires a value' >&2
+                echo 'Error: --type requires a value' >&2
                 exit 1
             fi
             i=$((i + 1))
             next_arg="${!i}"
             if [[ "$next_arg" == --* ]]; then
-                echo 'Error: --number requires a value' >&2
+                echo 'Error: --type requires a value' >&2
                 exit 1
             fi
-            BRANCH_NUMBER="$next_arg"
+            BRANCH_TYPE="$next_arg"
             ;;
-        --help|-h) 
-            echo "Usage: $0 [--json] [--short-name <name>] [--number N] <feature_description>"
+        --task)
+            if [ $((i + 1)) -gt $# ]; then
+                echo 'Error: --task requires a value' >&2
+                exit 1
+            fi
+            i=$((i + 1))
+            next_arg="${!i}"
+            if [[ "$next_arg" == --* ]]; then
+                echo 'Error: --task requires a value' >&2
+                exit 1
+            fi
+            TASK_ID="$next_arg"
+            ;;
+        --help|-h)
+            echo "Usage: $0 [--json] [--short-name <name>] [--type TYPE | --task TASK-ID] <feature_description>"
             echo ""
             echo "Options:"
             echo "  --json              Output in JSON format"
             echo "  --short-name <name> Provide a custom short name (2-4 words) for the branch"
-            echo "  --number N          Specify branch number manually (overrides auto-detection)"
+            echo "  --type TYPE         Branch type prefix (default: feat)"
+            echo "                      Allowed: feat, fix, chore, docs, test, refactor, style, perf, ci, build, hotfix"
+            echo "  --task TASK-ID      Use a task-number prefix instead of a type (e.g. TASK-1, JIRA-42)"
             echo "  --help, -h          Show this help message"
             echo ""
             echo "Examples:"
+            echo "  $0 'Add user authentication system'"
             echo "  $0 'Add user authentication system' --short-name 'user-auth'"
-            echo "  $0 'Implement OAuth2 integration for API' --number 5"
+            echo "  $0 'Fix login redirect bug' --type fix"
+            echo "  $0 'Implement OAuth2 integration' --task TASK-42"
             exit 0
             ;;
-        *) 
-            ARGS+=("$arg") 
+        *)
+            ARGS+=("$arg")
             ;;
     esac
     i=$((i + 1))
@@ -63,7 +81,7 @@ done
 
 FEATURE_DESCRIPTION="${ARGS[*]}"
 if [ -z "$FEATURE_DESCRIPTION" ]; then
-    echo "Usage: $0 [--json] [--short-name <name>] [--number N] <feature_description>" >&2
+    echo "Usage: $0 [--json] [--short-name <name>] [--type TYPE | --task TASK-ID] <feature_description>" >&2
     exit 1
 fi
 
@@ -87,73 +105,27 @@ find_repo_root() {
     return 1
 }
 
-# Function to get highest number from specs directory
-get_highest_from_specs() {
-    local specs_dir="$1"
-    local highest=0
-    
-    if [ -d "$specs_dir" ]; then
-        for dir in "$specs_dir"/*; do
-            [ -d "$dir" ] || continue
-            dirname=$(basename "$dir")
-            number=$(echo "$dirname" | grep -o '^[0-9]\+' || echo "0")
-            number=$((10#$number))
-            if [ "$number" -gt "$highest" ]; then
-                highest=$number
-            fi
-        done
-    fi
-    
-    echo "$highest"
+# Validate branch type against allowed list
+validate_branch_type() {
+    local type="$1"
+    case "$type" in
+        feat|fix|chore|docs|test|refactor|style|perf|ci|build|hotfix) return 0 ;;
+        *)
+            echo "Error: Invalid branch type '$type'." >&2
+            echo "Allowed types: feat, fix, chore, docs, test, refactor, style, perf, ci, build, hotfix" >&2
+            return 1
+            ;;
+    esac
 }
 
-# Function to get highest number from git branches
-get_highest_from_branches() {
-    local highest=0
-    
-    # Get all branches (local and remote)
-    branches=$(git branch -a 2>/dev/null || echo "")
-    
-    if [ -n "$branches" ]; then
-        while IFS= read -r branch; do
-            # Clean branch name: remove leading markers and remote prefixes
-            clean_branch=$(echo "$branch" | sed 's/^[* ]*//; s|^remotes/[^/]*/||')
-            
-            # Extract feature number if branch matches pattern ###-*
-            if echo "$clean_branch" | grep -q '^[0-9]\{3\}-'; then
-                number=$(echo "$clean_branch" | grep -o '^[0-9]\{3\}' || echo "0")
-                number=$((10#$number))
-                if [ "$number" -gt "$highest" ]; then
-                    highest=$number
-                fi
-            fi
-        done <<< "$branches"
+# Validate task ID format (e.g., TASK-1, JIRA-42, ABC-123)
+validate_task_id() {
+    local task="$1"
+    if echo "$task" | grep -qE '^[A-Z]+-[0-9]+$'; then
+        return 0
     fi
-    
-    echo "$highest"
-}
-
-# Function to check existing branches (local and remote) and return next available number
-check_existing_branches() {
-    local specs_dir="$1"
-
-    # Fetch all remotes to get latest branch info (suppress errors if no remotes)
-    git fetch --all --prune 2>/dev/null || true
-
-    # Get highest number from ALL branches (not just matching short name)
-    local highest_branch=$(get_highest_from_branches)
-
-    # Get highest number from ALL specs (not just matching short name)
-    local highest_spec=$(get_highest_from_specs "$specs_dir")
-
-    # Take the maximum of both
-    local max_num=$highest_branch
-    if [ "$highest_spec" -gt "$max_num" ]; then
-        max_num=$highest_spec
-    fi
-
-    # Return next number
-    echo $((max_num + 1))
+    echo "Error: Invalid task ID '$task'. Expected format: LETTERS-NUMBER (e.g., TASK-1, JIRA-42)" >&2
+    return 1
 }
 
 # Function to clean and format a branch name
@@ -232,47 +204,32 @@ generate_branch_name() {
     fi
 }
 
-# Generate branch name
+# Generate branch suffix from description or short name
 if [ -n "$SHORT_NAME" ]; then
-    # Use provided short name, just clean it up
     BRANCH_SUFFIX=$(clean_branch_name "$SHORT_NAME")
 else
-    # Generate from description with smart filtering
     BRANCH_SUFFIX=$(generate_branch_name "$FEATURE_DESCRIPTION")
 fi
 
-# Determine branch number
-if [ -z "$BRANCH_NUMBER" ]; then
-    if [ "$HAS_GIT" = true ]; then
-        # Check existing branches on remotes
-        BRANCH_NUMBER=$(check_existing_branches "$SPECS_DIR")
-    else
-        # Fall back to local directory check
-        HIGHEST=$(get_highest_from_specs "$SPECS_DIR")
-        BRANCH_NUMBER=$((HIGHEST + 1))
-    fi
+# Assemble branch name: type/suffix  or  TASK-ID/suffix
+if [ -n "$TASK_ID" ]; then
+    validate_task_id "$TASK_ID" || exit 1
+    BRANCH_PREFIX="$TASK_ID"
+else
+    validate_branch_type "$BRANCH_TYPE" || exit 1
+    BRANCH_PREFIX="$BRANCH_TYPE"
 fi
 
-# Force base-10 interpretation to prevent octal conversion (e.g., 010 → 8 in octal, but should be 10 in decimal)
-FEATURE_NUM=$(printf "%03d" "$((10#$BRANCH_NUMBER))")
-BRANCH_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
+BRANCH_NAME="${BRANCH_PREFIX}/${BRANCH_SUFFIX}"
 
 # GitHub enforces a 244-byte limit on branch names
-# Validate and truncate if necessary
 MAX_BRANCH_LENGTH=244
 if [ ${#BRANCH_NAME} -gt $MAX_BRANCH_LENGTH ]; then
-    # Calculate how much we need to trim from suffix
-    # Account for: feature number (3) + hyphen (1) = 4 chars
-    MAX_SUFFIX_LENGTH=$((MAX_BRANCH_LENGTH - 4))
-    
-    # Truncate suffix at word boundary if possible
-    TRUNCATED_SUFFIX=$(echo "$BRANCH_SUFFIX" | cut -c1-$MAX_SUFFIX_LENGTH)
-    # Remove trailing hyphen if truncation created one
-    TRUNCATED_SUFFIX=$(echo "$TRUNCATED_SUFFIX" | sed 's/-$//')
-    
+    # Account for prefix + slash
+    MAX_SUFFIX_LENGTH=$((MAX_BRANCH_LENGTH - ${#BRANCH_PREFIX} - 1))
+    TRUNCATED_SUFFIX=$(echo "$BRANCH_SUFFIX" | cut -c1-$MAX_SUFFIX_LENGTH | sed 's/-$//')
     ORIGINAL_BRANCH_NAME="$BRANCH_NAME"
-    BRANCH_NAME="${FEATURE_NUM}-${TRUNCATED_SUFFIX}"
-    
+    BRANCH_NAME="${BRANCH_PREFIX}/${TRUNCATED_SUFFIX}"
     >&2 echo "[specify] Warning: Branch name exceeded GitHub's 244-byte limit"
     >&2 echo "[specify] Original: $ORIGINAL_BRANCH_NAME (${#ORIGINAL_BRANCH_NAME} bytes)"
     >&2 echo "[specify] Truncated to: $BRANCH_NAME (${#BRANCH_NAME} bytes)"
@@ -293,7 +250,9 @@ else
     >&2 echo "[specify] Warning: Git repository not detected; skipped branch creation for $BRANCH_NAME"
 fi
 
-FEATURE_DIR="$SPECS_DIR/$BRANCH_NAME"
+# Sanitize branch name for directory (replace '/' with '-', lowercase)
+FEATURE_DIR_NAME=$(echo "$BRANCH_NAME" | tr '/' '-' | tr '[:upper:]' '[:lower:]')
+FEATURE_DIR="$SPECS_DIR/$FEATURE_DIR_NAME"
 mkdir -p "$FEATURE_DIR"
 
 TEMPLATE="$REPO_ROOT/.specify/templates/spec-template.md"
@@ -304,10 +263,9 @@ if [ -f "$TEMPLATE" ]; then cp "$TEMPLATE" "$SPEC_FILE"; else touch "$SPEC_FILE"
 export SPECIFY_FEATURE="$BRANCH_NAME"
 
 if $JSON_MODE; then
-    printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s"}\n' "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_NUM"
+    printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","BRANCH_PREFIX":"%s"}\n' "$BRANCH_NAME" "$SPEC_FILE" "$BRANCH_PREFIX"
 else
     echo "BRANCH_NAME: $BRANCH_NAME"
     echo "SPEC_FILE: $SPEC_FILE"
-    echo "FEATURE_NUM: $FEATURE_NUM"
     echo "SPECIFY_FEATURE environment variable set to: $BRANCH_NAME"
 fi

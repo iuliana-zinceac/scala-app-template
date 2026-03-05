@@ -11,21 +11,16 @@
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Scala 3.3.x
+**Primary Dependencies**: Cats Effect 3, Http4s + Ember, Tapir, Doobie + HikariCP, Flyway, PureConfig, Log4cats + Logback
+**Storage**: PostgreSQL (via Doobie); [add other storage if applicable or N/A]
+**Messaging**: [e.g., Kafka via fs2-kafka, or N/A]
+**Testing**: MUnit + Cats Effect (unit), TestContainers + PostgreSQL (integration), Gatling (performance)
+**Target Platform**: JVM / Linux server
+**Project Type**: web-service
+**Performance Goals**: [feature-specific, e.g., p95 < 200ms at 500 req/s or NEEDS CLARIFICATION]
+**Constraints**: [feature-specific, e.g., no blocking IO, pure FP, or NEEDS CLARIFICATION]
+**Scale/Scope**: [feature-specific, e.g., expected load, data volume or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
@@ -56,43 +51,53 @@ specs/[###-feature]/
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+src/main/scala/dev/iuly/
+├── main/
+│   ├── Main.scala              # Entry point (IOApp)
+│   ├── Config.scala            # Top-level config loader
+│   └── AppModule.scala         # DI container & HTTP server wiring
+│
+└── [feature]/                  # One package per bounded context
+    ├── domain/                 # Pure business logic — NO framework deps
+    │   ├── models.scala        # Opaque types, value objects, domain entities
+    │   ├── errors.scala        # Domain error ADT
+    │   ├── [Feature]Repository.scala  # Repository trait (port)
+    │   └── [Feature]Service.scala     # Service implementation
+    │
+    └── infra/
+        ├── driven/             # Outgoing adapters (app calls these)
+        │   ├── persistence/    # Database adapter
+        │   │   ├── config/
+        │   │   │   ├── Config.scala    # DB config case class
+        │   │   │   └── Database.scala  # HikariCP + Flyway init
+        │   │   ├── [Feature]Repository.scala  # Repository impl (adapter)
+        │   │   ├── [Feature]Storage.scala     # Doobie SQL queries
+        │   │   └── entities.scala             # DB record types
+        │   └── kafka/      # Outgoing message publishing (e.g. Kafka producer)
+        │       ├── [Feature]Publisher.scala   # Publisher impl (adapter)
+        │       └── entities.scala             # Message payload types
+        └── driving/            # Incoming adapters (these call the app)
+            ├── http/           # HTTP adapter
+            │   ├── [Feature]Endpoint.scala    # Tapir endpoint definition
+            │   ├── [Feature]Route.scala       # Route handler with error mapping
+            │   └── entities.scala             # HTTP request/response types
+            └── kafka/      # Incoming message consumption (e.g. Kafka consumer)
+                └── [Feature]Consumer.scala    # Consumer handler
+                └── entities.scala             # Message payload types
 
-tests/
-├── contract/
-├── integration/
-└── unit/
+src/test/scala/dev/iuly/[feature]/
+├── domain/                     # Unit tests for domain (pure, no DB/HTTP)
+└── infra/                      # Unit tests for adapters (mocked dependencies)
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+integration/src/test/scala/dev/iuly/[feature]/
+└── infra/                      # Integration tests (TestContainers + PostgreSQL)
 
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+src/main/resources/
+├── application.conf            # PureConfig configuration
+└── db/migration/               # Flyway SQL migrations (V1__*.sql)
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: [Document which feature package(s) are added and any deviations from the standard hexagonal layout, with justification]
 
 ## Complexity Tracking
 
