@@ -54,16 +54,16 @@ object Dependencies {
 
   object http {
     val main: Seq[ModuleID] = Seq(
-      "org.http4s"                  %% "http4s-core"         % http4s,
-      "org.http4s"                  %% "http4s-dsl"          % http4s,
-      "org.http4s"                  %% "http4s-client"       % http4s,
-      "org.http4s"                  %% "http4s-circe"        % http4s,
-      "org.http4s"                  %% "http4s-ember-server" % http4s,
-      "com.softwaremill.sttp.tapir" %% "tapir-core"          % tapir,
-      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapir,
-      "com.softwaremill.sttp.tapir" %% "tapir-json-circe"    % tapir,
-      "com.softwaremill.sttp.tapir"    %% "tapir-openapi-docs"  % tapir,
-      "com.softwaremill.sttp.tapir"    %% "tapir-swagger-ui"    % tapir,
+      "org.http4s"                    %% "http4s-core"         % http4s,
+      "org.http4s"                    %% "http4s-dsl"          % http4s,
+      "org.http4s"                    %% "http4s-client"       % http4s,
+      "org.http4s"                    %% "http4s-circe"        % http4s,
+      "org.http4s"                    %% "http4s-ember-server" % http4s,
+      "com.softwaremill.sttp.tapir"   %% "tapir-core"          % tapir,
+      "com.softwaremill.sttp.tapir"   %% "tapir-http4s-server" % tapir,
+      "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"    % tapir,
+      "com.softwaremill.sttp.tapir"   %% "tapir-openapi-docs"  % tapir,
+      "com.softwaremill.sttp.tapir"   %% "tapir-swagger-ui"    % tapir,
       "com.softwaremill.sttp.apispec" %% "openapi-circe-yaml"  % "0.11.6"
     )
 
@@ -74,10 +74,10 @@ object Dependencies {
     val main: Seq[ModuleID] = Seq(
       "org.flywaydb"   % "flyway-core"                % flyway,
       "org.flywaydb"   % "flyway-database-postgresql" % flyway,
-      "org.tpolecat"  %% "doobie-hikari"   % doobie,
-      "org.tpolecat"  %% "doobie-core"     % doobie,
-      "org.tpolecat"  %% "doobie-postgres" % doobie,
-      "org.postgresql" % "postgresql"      % postgres
+      "org.tpolecat"  %% "doobie-hikari"              % doobie,
+      "org.tpolecat"  %% "doobie-core"                % doobie,
+      "org.tpolecat"  %% "doobie-postgres"            % doobie,
+      "org.postgresql" % "postgresql"                 % postgres
     )
 
     val all: Seq[ModuleID] = main

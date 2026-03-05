@@ -1,7 +1,7 @@
 package dev.iuly.helloapp.infra.driven.persistence
 
-import cats.implicits.*
 import cats.effect.MonadCancelThrow
+import cats.implicits.*
 import cats.{MonadThrow, ~>}
 import dev.iuly.helloapp.domain.*
 import doobie.Transactor
