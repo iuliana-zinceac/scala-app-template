@@ -94,17 +94,22 @@ The template follows **hexagonal architecture** (ports & adapters):
    direnv allow
    ```
 
-2. Start PostgreSQL:
+2. Activate git hooks:
+   ```bash
+   git config core.hooksPath .git-hooks
+   ```
+
+3. Start PostgreSQL:
    ```bash
    docker compose up -d
    ```
 
-3. Run the application:
+4. Run the application:
    ```bash
    sbt run
    ```
 
-4. Try it out:
+5. Try it out:
    ```bash
    curl http://localhost:8080/hello/World
    ```

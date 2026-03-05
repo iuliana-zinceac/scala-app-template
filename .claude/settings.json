@@ -1,12 +1,25 @@
 {
+  "enabledPlugins": {
+    "feature-dev@claude-plugins-official": true,
+    "serena@claude-plugins-official": true
+  },
   "mcpServers": {
     "git": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "."]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git",
+        "--repository",
+        "."
+      ]
     },
     "postgres": {
       "command": "sh",
-      "args": ["-c", "npx -y @modelcontextprotocol/server-postgres $DATABASE_URL"]
+      "args": [
+        "-c",
+        "npx -y @modelcontextprotocol/server-postgres $DATABASE_URL"
+      ]
     }
   }
 }
+
