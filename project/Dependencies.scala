@@ -64,7 +64,7 @@ object Dependencies {
       "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"    % tapir,
       "com.softwaremill.sttp.tapir"   %% "tapir-openapi-docs"  % tapir,
       "com.softwaremill.sttp.tapir"   %% "tapir-swagger-ui"    % tapir,
-      "com.softwaremill.sttp.apispec" %% "openapi-circe-yaml"  % "0.11.6"
+      "com.softwaremill.sttp.apispec" %% "openapi-circe-yaml"  % "0.11.10"
     )
 
     val all: Seq[ModuleID] = main
