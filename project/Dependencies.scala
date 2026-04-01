@@ -8,7 +8,7 @@ object Versions {
   val logback = "1.5.24"
   val logbackEncoder = "9.0"
   val http4s = "0.23.33"
-  val tapir = "1.13.5"
+  val tapir = "1.13.14"
   val flyway = "11.20.1"
   val doobie = "1.0.0-RC11"
   val postgres = "42.7.8"
