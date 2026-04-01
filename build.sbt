@@ -24,7 +24,16 @@ lazy val performance = (project in file("performance"))
   .enablePlugins(GatlingPlugin)
   .settings(
     scalaVersion := "2.13.16",
-    libraryDependencies ++= Dependencies.performance
+    semanticdbEnabled := true, // for scalafix
+    scalacOptions ++= Seq("-Wunused:imports"),
+    libraryDependencies ++= Dependencies.performance,
+    Test / unmanagedResourceDirectories += (root / Compile / resourceDirectory).value,
+    // Resolves problem related to biased locking
+    Gatling / javaOptions := (Gatling / javaOptions).value.filterNot(_.contains("UseBiasedLocking")) ++ Seq(
+      "--add-opens=java.base/java.lang=ALL-UNNAMED",
+      "--add-opens=java.base/java.util=ALL-UNNAMED",
+      "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+    )
   )
 
 addCommandAlias("fmt", ";scalafmtAll ;scalafmtSbt ;scalafixAll")
