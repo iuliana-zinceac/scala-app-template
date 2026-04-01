@@ -90,7 +90,9 @@ object Dependencies {
   )
 
   val performance: Seq[ModuleID] = Seq(
-    "io.gatling.highcharts" % "gatling-charts-highcharts" % gatling % Test,
-    "io.gatling"            % "gatling-test-framework"    % gatling % Test
+    "io.gatling.highcharts" % "gatling-charts-highcharts" % gatling    % Test,
+    "io.gatling"            % "gatling-test-framework"    % gatling    % Test,
+    "org.scalacheck"       %% "scalacheck"                % "1.17.0"   % Test,
+    "org.typelevel"        %% "cats-effect"               % catsEffect % Test
   )
 }

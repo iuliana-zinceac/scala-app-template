@@ -123,10 +123,33 @@ The template follows **hexagonal architecture** (ports & adapters):
 | `sbt run` | Start the application |
 | `sbt test` | Run unit tests |
 | `sbt integration/test` | Run integration tests (requires Docker) |
-| `sbt Gatling/test` | Run performance tests |
+| `sbt "performance/Gatling/test"` | Run performance tests |
 | `sbt fmt` | Format code + organize imports |
 | `sbt fmtCheck` | Check formatting (used in CI) |
 | `sbt ci` | Full CI pipeline: clean, format check, test |
+
+## Performance Tests
+
+Gatling load tests live in `performance/src/test/scala/`. The simulation targets the `/hello/{name}` endpoint.
+
+**Prerequisites:** the application must be running before starting the tests.
+
+```bash
+# Run against localhost:8080 (default)
+sbt "performance/Gatling/test"
+
+# Run against a different environment
+APP_BASE_URL=http://your-host:8080 sbt "performance/Gatling/test"
+```
+
+The simulation ramps from 1 to 50 users/sec over 30 seconds, then holds 50 users/sec for 60 seconds. It fails if:
+- p95 response time ≥ 500ms
+- mean response time ≥ 200ms
+- successful requests ≤ 99%
+
+Reports are generated under `performance/target/gatling/` after the run.
+
+> **Note:** the `performance` subproject uses Scala 2.13 (Gatling requirement), while the rest of the project uses Scala 3.
 
 ## Configuration
 
