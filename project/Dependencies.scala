@@ -4,7 +4,7 @@ import sbt.*
 object Versions {
   val catsEffect = "3.6.3"
   val pureconfig = "0.17.10"
-  val log4cats = "2.7.1"
+  val log4cats = "2.8.0"
   val logback = "1.5.32"
   val logbackEncoder = "9.0"
   val http4s = "0.23.33"
