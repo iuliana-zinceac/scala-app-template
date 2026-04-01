@@ -11,7 +11,7 @@ object Versions {
   val tapir = "1.13.5"
   val flyway = "11.20.1"
   val doobie = "1.0.0-RC11"
-  val postgres = "42.7.8"
+  val postgres = "42.7.10"
 
   val gatling = "3.14.9"
   val testContainers = "0.44.1"
