@@ -15,7 +15,7 @@ object Versions {
 
   val gatling = "3.14.9"
   val testContainers = "0.44.1"
-  val scalaMock = "7.5.3"
+  val scalaMock = "7.5.5"
   val munit = "1.2.4"
   val munitCatsEffect = "2.1.0"
   val scalaCheckEffect = "2.1.0"
