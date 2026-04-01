@@ -14,9 +14,7 @@ class HelloRepositoryIT extends CatsEffectSuite with DatabaseMunitFixture {
       for {
         _     <- storage.recordGreeting("John", time)
         count <- storage.getGreetings("John")
-      } yield {       
-        assertEquals(obtained = count, expected = Some(GreetingsRecord("John", 1)))
-      }
+      } yield assertEquals(obtained = count, expected = Some(GreetingsRecord("John", 1)))
     }
   }
 }
