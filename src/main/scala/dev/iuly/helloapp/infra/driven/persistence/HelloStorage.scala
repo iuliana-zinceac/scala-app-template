@@ -3,9 +3,9 @@ package dev.iuly.helloapp.infra.driven.persistence
 import java.time.Instant
 
 import cats.implicits.*
-import doobie.implicits.*
-import doobie.postgres.implicits.*
-import doobie.{ConnectionIO, *}
+import org.typelevel.doobie.implicits.*
+import org.typelevel.doobie.postgres.implicits.*
+import org.typelevel.doobie.{ConnectionIO, *}
 
 trait HelloStorage[F[_]] {
 
