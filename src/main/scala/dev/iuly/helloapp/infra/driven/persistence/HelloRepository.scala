@@ -4,7 +4,7 @@ import cats.effect.MonadCancelThrow
 import cats.implicits.*
 import cats.{MonadThrow, ~>}
 import dev.iuly.helloapp.domain.*
-import doobie.Transactor
+import org.typelevel.doobie.Transactor
 
 object HelloRepository {
 

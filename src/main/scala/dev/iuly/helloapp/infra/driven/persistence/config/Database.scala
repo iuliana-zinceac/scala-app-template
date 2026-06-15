@@ -5,8 +5,8 @@ import javax.sql.DataSource
 import cats.effect.{Async, Resource}
 import com.zaxxer.hikari.HikariDataSource
 import dev.iuly.helloapp.infra.driven.persistence.config.Config
-import doobie.Transactor
-import doobie.util.ExecutionContexts
+import org.typelevel.doobie.Transactor
+import org.typelevel.doobie.util.ExecutionContexts
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.output.MigrateResult
 

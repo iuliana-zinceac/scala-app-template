@@ -6,7 +6,7 @@ import com.comcast.ip4s.*
 import dev.iuly.helloapp.domain.*
 import dev.iuly.helloapp.infra.driven.persistence.HelloRepository as HelloRepositoryImpl
 import dev.iuly.helloapp.infra.driving.http.{HelloEndpoint, HelloRoute}
-import doobie.Transactor
+import org.typelevel.doobie.Transactor
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.Router
 import org.typelevel.log4cats.Logger

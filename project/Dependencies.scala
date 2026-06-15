@@ -10,7 +10,7 @@ object Versions {
   val http4s = "0.23.33"
   val tapir = "1.13.14"
   val flyway = "11.20.3"
-  val doobie = "1.0.0-RC12"
+  val doobie = "1.0.0-RC13"
   val postgres = "42.7.10"
 
   val gatling = "3.14.9"
@@ -74,9 +74,9 @@ object Dependencies {
     val main: Seq[ModuleID] = Seq(
       "org.flywaydb"   % "flyway-core"                % flyway,
       "org.flywaydb"   % "flyway-database-postgresql" % flyway,
-      "org.tpolecat"  %% "doobie-hikari"              % doobie,
-      "org.tpolecat"  %% "doobie-core"                % doobie,
-      "org.tpolecat"  %% "doobie-postgres"            % doobie,
+      "org.typelevel" %% "doobie-hikari"              % doobie,
+      "org.typelevel" %% "doobie-core"                % doobie,
+      "org.typelevel" %% "doobie-postgres"            % doobie,
       "org.postgresql" % "postgresql"                 % postgres
     )
 
